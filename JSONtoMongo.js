@@ -3,6 +3,7 @@
   Import modules/files you may need to correctly run the script. 
   Make sure to save your DB's uri in the config file, then import it with a require statement!
  */
+var listingData, listings;
 var fs = require('fs'),
     mongoose = require('mongoose'), 
     Schema = mongoose.Schema, 
@@ -13,6 +14,7 @@ var fs = require('fs'),
 //see https://mongoosejs.com/docs/connections.html
 //See https://docs.atlas.mongodb.com/driver-connection/
 
+mongoose.connect(config.db.uri, { useNewUrlParser: true });
 /* 
   Instantiate a mongoose model for each listing object in the JSON file, 
   and then save it to your Mongo database 
@@ -20,7 +22,32 @@ var fs = require('fs'),
 
   Remember that we needed to read in a file like we did in Bootcamp Assignment #1.
  */
-
+fs.readFile('listings.json', 'utf8', function(err, data) {
+	if (err) throw err;
+	listingData = JSON.parse(data);
+	listingData.entries.forEach(function(element) {
+		if (element.coordinates) {
+			listings = ({
+				code: element.code,
+				name: element.name,
+				coordinates: {
+					latitude: element.coordinates.latitude,
+					longitude: element.coordinates.longitude
+				},
+				address: element.address
+			})
+			Listing(listings).save();
+		}
+		else {
+			listings = ({
+				code: element.code,
+				name: element.name,
+				address: element.address
+			})
+			Listing(listings).save();
+		}
+	});
+});
 
 /*  
   Check to see if it works: Once you've written + run the script, check out your MongoLab database to ensure that 
