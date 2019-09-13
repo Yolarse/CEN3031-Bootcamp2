@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema, 
     Listing = require('./ListingSchema.js'), 
     config = require('./config');
+const util = require('util');
 mongoose.connect(config.db.uri, { useNewUrlParser: true });
 var findLibraryWest = function() {
   /* 
@@ -46,7 +47,7 @@ var retrieveAllListings = function() {
    */
    Listing.find({}, function(err, listing) {
 	   if (err) throw err;	
-	   console.log(listing);
+	   console.log(util.inspect(listing, {'maxArrayLength': null}));
    });
 };
 
